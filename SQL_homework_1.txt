@@ -1,0 +1,81 @@
+1. How many different products are in each order? Which order has the most number of unique products?
+
+
+
+SELECT OrderID, COUNT(ProductID)
+FROM [OrderDetails]
+GROUP BY OrderID
+ORDER BY COUNT(ProductID) DESC
+
+
+2.Which products are sold in jars? What is the most expensive product that's sold in jars?
+
+SELECT * FROM [Products]
+where unit like "%jar%"
+order by price desc
+
+
+
+3.What are the product names are included in order ID 10250?
+
+SELECT ProductName 
+FROM Products
+WHERE ProductID in (SELECT ProductID 
+		    FROM OrderDetails 
+                   WHERE OrderID =  10250)
+
+4.What products are contained in category 'Dairy Products'?
+
+SELECT * FROM [Products]
+WHERE CategoryID = (SELECT CategoryID FROM Categories WHERE CategoryName = "Dairy Products")
+
+
+
+
+Sakira
+
+#1. Which actors have the first name 'Scarlett'?
+select * from actor 
+where first_name="Scarlett";
+
+#2. Which actors have the last name 'Johansson'
+select * from actor
+where last_name="Johansson"
+
+#3.How many distinct actors last names are there
+SELECT DISTINCT COUNT(last_name)
+FROM actor;
+
+#4.Which last names appear more than once?
+SELECT last_name, count(last_name)  
+FROM actor
+GROUP BY last_name;
+HAVING count(last_name) > 1
+
+#5.How many total rentals occured in May?
+SELECT count(rental_id) FROM rental
+WHERE rental_date BETWEEN "2005-05-01" and "2005-05-31";
+
+#6.How many staff processed rentals in May?
+SELECT count(distinct staff_id) as Number_Of_Staff_Operated_In_May
+FROM Rental
+WHERE rental_date between "2005-05-01" and "2005-05-31"
+
+#7.Which staff processed the most rentals in May?
+SELECT Staff_id, count(rental_id) mycount
+FROM Rental
+WHERE rental_date between "2005-05-01" and "2005-05-31"
+GROUP BY Staff_id
+Order by mycount desc
+
+#8.Which customer paid the most rental in August?
+SELECT customer_id, sum(amount) as total_payment FROM payment
+group by customer_id
+order by total_payment desc;
+
+#9.A summary of rental total amount by month.
+
+SELECT DATE_FORMAT(payment_date,"%Y-%M") as month, sum(amount) as total_payment 
+FROM payment
+group by month;
+
