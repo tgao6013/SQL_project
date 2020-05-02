@@ -1,34 +1,82 @@
-1. How many different products are in each order? Which order has the most number of unique products?
+1. How many different products are in each order? 
 
 
 
-SELECT OrderID, COUNT(ProductID)
+SELECT OrderID, COUNT(DISTINCT ProductID) as Count_Product
 FROM [OrderDetails]
 GROUP BY OrderID
-ORDER BY COUNT(ProductID) DESC
+ORDER BY 1 DESC
 
 
-2.Which products are sold in jars? What is the most expensive product that's sold in jars?
+Which order has the most number of unique products?
+
+
+SELECT OrderID, COUNT(DISTINCT ProductID) as Count_Product
+FROM [OrderDetails]
+GROUP BY OrderID
+HAVING COUNT (DISTINCT ProductID)=
+(SELECT max(Count_Product)
+FROM ( SELECT OrderID, COUNT(DISTINCT ProductID) as Count_Product 
+					 FROM [OrderDetails]
+					 GROUP BY OrderID
+					 ORDER BY 2 DESC))
+
+
+2.Which products are sold in jars? 
 
 SELECT * FROM [Products]
 where unit like "%jar%"
 order by price desc
 
 
+What is the most expensive product that's sold in jars?
+
+
+SELECT * FROM Products
+WHERE unit LIKE "%jars%" and Price=
+   (SELECT max(price) 
+    FROM Products 
+    WHERE unit like "%jars%")
+
 
 3.What are the product names are included in order ID 10250?
 
+--- solution 1
 SELECT ProductName 
 FROM Products
 WHERE ProductID in (SELECT ProductID 
 		    FROM OrderDetails 
                    WHERE OrderID =  10250)
 
+
+--- solution 2
+
+SELECT Products.ProductName, OrderDetails.OrderID
+FROM (Products
+Join OrderDetails
+on Products.ProductID=OrderDetails.ProductID)
+WHERE OrderID =  10250
+
+
+
 4.What products are contained in category 'Dairy Products'?
 
-SELECT * FROM [Products]
-WHERE CategoryID = (SELECT CategoryID FROM Categories WHERE CategoryName = "Dairy Products")
+--- solution 1
+SELECT ProductName, 'Diary Products' as CategoryName
+FROM [Products]
+WHERE CategoryID = 
+	(SELECT CategoryID 
+	 FROM Categories 
+	 WHERE CategoryName = "Dairy Products")
 
+
+
+--- solution 2
+SELECT Products.ProductName, Categories.CategoryID
+FROM Products
+JOIN Categories
+ON Products.CategoryID=Categories.CategoryID
+WHERE CategoryName = 'Dairy Products'
 
 
 
@@ -62,7 +110,7 @@ FROM Rental
 WHERE rental_date between "2005-05-01" and "2005-05-31"
 
 #7.Which staff processed the most rentals in May?
-SELECT Staff_id, count(rental_id) mycount
+SELECT Staff_id, count(rental_id) AS mycount
 FROM Rental
 WHERE rental_date between "2005-05-01" and "2005-05-31"
 GROUP BY Staff_id
